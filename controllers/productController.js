@@ -2,7 +2,9 @@ import fs from "fs";
 import csv from "csv-parser";
 import Product from "../models/product.js";
 import { Op } from "sequelize";
+
 const REQUIRED_FIELDS = ["sku", "name", "brand", "mrp", "price"];
+
 function validateRow(row) {
   const errors = [];
   for (const field of REQUIRED_FIELDS) {
@@ -34,8 +36,10 @@ function validateRow(row) {
 export const uploadCSV = (req, res) => {
   const file = req.file;
   if (!file) return res.status(400).json({ error: "No file uploaded" });
+
   const validRows = [];
   const failedRows = [];
+
   fs.createReadStream(file.path)
     .pipe(csv({ mapHeaders: ({ header }) => header.trim().toLowerCase() }))
     .on("data", (row) => {
@@ -91,11 +95,22 @@ export const uploadCSV = (req, res) => {
 
 export const listProducts = async (req, res) => {
   const page = Math.max(1, parseInt(req.query.page || "1", 10));
-  const limit = Math.max(1, parseInt(req.query.limit || "10", 10));
+  const limit = Math.max(1, parseInt(req.query.limit || "25", 10)); // default = 25
   const offset = (page - 1) * limit;
+
   try {
-    const items = await Product.findAll({ offset, limit });
-    res.json(items);
+    const { count, rows } = await Product.findAndCountAll({
+      offset,
+      limit,
+    });
+
+    res.json({
+      page,
+      limit,
+      totalCount: count,
+      totalPages: Math.ceil(count / limit),
+      items: rows,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

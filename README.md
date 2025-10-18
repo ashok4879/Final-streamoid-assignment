@@ -135,11 +135,11 @@ Retrieve all products with pagination support.
 
 **Query Parameters:**
 - `page` (optional, default: 1): Page number
-- `limit` (optional, default: 10): Items per page
+- `limit` (optional, default: 25): Items per page
 
 **Request:**
 ```bash
-curl http://localhost:8000/products?page=1&limit=10
+curl http://localhost:8000/products?page=1&limit=25
 ```
 
 **Response:**
@@ -169,8 +169,8 @@ curl http://localhost:8000/products?page=1&limit=10
   ],
   "pagination": {
     "page": 1,
-    "limit": 10,
-    "total": 17,
+    "limit": 25,
+    "total": 26,
     "totalPages": 2
   }
 }
